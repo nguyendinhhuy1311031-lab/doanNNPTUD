@@ -5,6 +5,6 @@ TODO.md
 .env
 key
 dist
-coveragemongodb-data/
+coverage`r`nmongodb-data/
 mongodb-log/
 uploads/
