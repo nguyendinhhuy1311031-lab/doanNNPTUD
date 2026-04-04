@@ -1,10 +1,9 @@
-# ShopViet - E-commerce API & Frontend
 
 **Nguyễn Đình Huy - 2180606153**
 
 ## Mô tả dự án
 
-Đây là một dự án E-commerce đơn giản với backend Node.js + Express + MongoDB và frontend tĩnh HTML/CSS/JS.
+Đây là một dự án đơn giản với backend Node.js + Express + MongoDB và frontend tĩnh HTML/CSS/JS.
 
 ## Cách chạy
 
@@ -25,7 +24,7 @@
    ```
 
 4. Mở trình duyệt:
-   - `http://localhost:3000`
+   - `http://localhost:3001`
 
 ## Cấu trúc chính
 
