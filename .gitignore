@@ -1,0 +1,8 @@
+.directory
+node_modules
+TODO.md
+.vscode
+.env
+key
+dist
+coverage

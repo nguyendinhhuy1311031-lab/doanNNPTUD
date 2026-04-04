@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🛒 ShopViet - Quản lý mua bán đồ điện tử của Huy</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <h1 class="logo">🛒 ShopViet</h1>
+            <div class="nav-links">
+                <button id="homeBtn" class="nav-btn">🏠 Trang chủ</button>
+                <button id="adminBtn" class="nav-btn" style="display:none;">👑 Quản lý</button>
+                <button id="ordersBtn" class="nav-btn" style="display:none;">📋 Đơn hàng</button>
+                <button id="cartBtn" class="nav-btn">🛒 Giỏ (<span id="cartCount">0</span>)</button>
+                <button id="logoutBtn" class="nav-btn" style="display:none;">🚪 Đăng xuất</button>
+                <button id="loginBtn" class="nav-btn">🔐 Đăng nhập</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div id="app" class="app-container">
+        <!-- Page: Home -->
+        <div id="homePage" class="page active">
+            <div class="home-header">
+                <h2>Chào mừng đến ShopViet</h2>
+                <p>Mua sắm hàng hoá chất lượng cao với giá tốt</p>
+            </div>
+
+            <!-- Categories Filter -->
+            <div class="filter-section">
+                <label>Danh mục:</label>
+                <select id="categoryFilter">
+                    <option value="">Tất cả</option>
+                </select>
+                <input type="text" id="searchInput" placeholder="Tìm sản phẩm...">
+                <button onclick="filterProducts()">Tìm</button>
+            </div>
+
+            <!-- Products Grid -->
+            <div id="productsGrid" class="products-grid">
+                <!-- Products will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Page: Product Detail -->
+        <div id="productDetailPage" class="page">
+            <button onclick="goToHome()" class="back-btn">← Quay lại</button>
+            <div id="productDetail" class="product-detail-container">
+                <!-- Product details will be loaded here -->
+            </div>
+            <div id="commentsSection" class="comments-section">
+                <h3>Bình luận</h3>
+                <div id="commentsList" class="comments-list"></div>
+                <div id="commentForm" style="display:none;" class="comment-form">
+                    <h4>Viết bình luận</h4>
+                    <div>
+                        <label>Đánh giá:</label>
+                        <select id="commentRating">
+                            <option value="5">5 sao</option>
+                            <option value="4">4 sao</option>
+                            <option value="3">3 sao</option>
+                            <option value="2">2 sao</option>
+                            <option value="1">1 sao</option>
+                        </select>
+                    </div>
+                    <textarea id="commentText" placeholder="Nội dung bình luận..." rows="4"></textarea>
+                    <button onclick="submitComment()">Gửi bình luận</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page: Login -->
+        <div id="loginPage" class="page">
+            <div class="form-container">
+                <h3>🔐 Đăng Nhập</h3>
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label>Tên người dùng</label>
+                        <input type="text" id="loginUsername" placeholder="Nhập tên người dùng" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Mật khẩu</label>
+                        <input type="password" id="loginPassword" placeholder="Nhập mật khẩu" required>
+                    </div>
+                    <button type="submit" class="form-btn">Đăng Nhập</button>
+                </form>
+                <div class="switch-link">
+                    Chưa có tài khoản? 
+                    <button onclick="goToSignup()" type="button">Đăng ký ngay</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page: Signup -->
+        <div id="signupPage" class="page">
+            <div class="form-container">
+                <h3>✨ Đăng Ký Tài Khoản</h3>
+                <form onsubmit="handleSignup(event)">
+                    <div class="form-group">
+                        <label>Họ tên</label>
+                        <input type="text" id="signupName" placeholder="Nhập họ tên" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tên người dùng</label>
+                        <input type="text" id="signupUsername" placeholder="Nhập tên người dùng" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="signupEmail" placeholder="Nhập email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Mật khẩu</label>
+                        <input type="password" id="signupPassword" placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Loại tài khoản</label>
+                        <select id="signupRole">
+                            <option value="user">👤 Người dùng thường</option>
+                            <option value="admin">👑 Admin</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="form-btn">Đăng Ký</button>
+                </form>
+                <div class="switch-link">
+                    Đã có tài khoản? 
+                    <button onclick="goToLogin()" type="button">Đăng nhập</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page: Admin Dashboard -->
+        <div id="adminDashboardPage" class="page">
+            <div class="admin-header" style="background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%); color: white; padding: 2rem; border-radius: 12px; margin-bottom: 2rem; text-align: center;">
+                <h2>👑 Quản lý mua bán đồ điện tử của Huy</h2>
+                <p>Chọn một khu vực để quản lý sản phẩm, danh mục hoặc người dùng</p>
+            </div>
+            <div class="admin-dashboard-grid">
+                <div class="admin-dashboard-card">
+                    <h3>📦 Sản phẩm</h3>
+                    <p>Thêm, sửa, xóa sản phẩm và quản lý hình ảnh</p>
+                    <button class="btn btn-primary" onclick="goToAdminProducts()">Mở quản lý sản phẩm</button>
+                </div>
+                <div class="admin-dashboard-card">
+                    <h3>📂 Danh mục</h3>
+                    <p>Thêm, sửa, xóa danh mục và hình ảnh danh mục</p>
+                    <button class="btn btn-primary" onclick="goToAdminCategories()">Mở quản lý danh mục</button>
+                </div>
+                <div class="admin-dashboard-card">
+                    <h3>👥 Người dùng</h3>
+                    <p>Promote user thành admin và xem thông tin người dùng</p>
+                    <button class="btn btn-primary" onclick="goToAdminUsers()">Mở quản lý người dùng</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page: Admin Products -->
+        <div id="adminProductsPage" class="page">
+            <button onclick="goToAdminDashboard()" class="admin-back-btn back-btn">← Quay lại bảng quản lý</button>
+            <div class="admin-header" style="background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%); color: white; padding: 2rem; border-radius: 12px; margin: 2rem 0; text-align: center;">
+                <h2>📦 Quản lý sản phẩm</h2>
+                <p>Thêm mới, sửa, xóa sản phẩm của cửa hàng</p>
+            </div>
+            <div class="admin-content-grid">
+                <div class="admin-card">
+                    <h4>Thêm / Sửa sản phẩm</h4>
+                    <div class="form-group">
+                        <label>Tên sản phẩm</label>
+                        <input type="text" id="productName" placeholder="Nhập tên sản phẩm" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Giá</label>
+                        <input type="number" id="productPrice" placeholder="Nhập giá" min="0" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Giảm giá (%)</label>
+                        <input type="number" id="productDiscount" placeholder="Nhập giảm giá" min="0" max="100" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Kho hàng</label>
+                        <input type="number" id="productStock" placeholder="Nhập kho hàng" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Danh mục</label>
+                        <select id="productCategory" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Mô tả</label>
+                        <textarea id="productDesc" placeholder="Mô tả sản phẩm" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Hình ảnh</label>
+                        <input type="file" id="productImages" multiple accept="image/*">
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" id="productFormButton" onclick="handleAddProduct(event)" class="btn btn-primary">Thêm Sản Phẩm</button>
+                        <button type="button" id="cancelProductEditButton" onclick="cancelProductEdit()" class="btn btn-secondary" style="display:none;">Huỷ sửa</button>
+                    </div>
+                </div>
+                <div class="admin-card">
+                    <h4>Danh sách sản phẩm</h4>
+                    <div id="productsList"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page: Admin Categories -->
+        <div id="adminCategoriesPage" class="page">
+            <button onclick="goToAdminDashboard()" class="admin-back-btn back-btn">← Quay lại bảng quản lý</button>
+            <div class="admin-header" style="background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%); color: white; padding: 2rem; border-radius: 12px; margin: 2rem 0; text-align: center;">
+                <h2>📂 Quản lý danh mục</h2>
+                <p>Thêm mới, sửa, xóa danh mục sản phẩm</p>
+            </div>
+            <div class="admin-content-grid">
+                <div class="admin-card">
+                    <h4>Thêm / Sửa danh mục</h4>
+                    <div class="form-group">
+                        <label>Tên danh mục</label>
+                        <input type="text" id="categoryName" placeholder="Nhập tên danh mục">
+                    </div>
+                    <div class="form-group">
+                        <label>Mô tả</label>
+                        <textarea id="categoryDesc" placeholder="Mô tả danh mục" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Hình ảnh</label>
+                        <input type="file" id="categoryImage" accept="image/*">
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" id="categoryFormButton" onclick="handleAddCategory()" class="btn btn-primary">Thêm Danh Mục</button>
+                        <button type="button" id="cancelCategoryEditButton" onclick="cancelCategoryEdit()" class="btn btn-secondary" style="display:none;">Huỷ sửa</button>
+                    </div>
+                </div>
+                <div class="admin-card">
+                    <h4>Danh sách danh mục</h4>
+                    <div id="categoriesList"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page: Admin Users -->
+        <div id="adminUsersPage" class="page">
+            <button onclick="goToAdminDashboard()" class="admin-back-btn back-btn">← Quay lại bảng quản lý</button>
+            <div class="admin-header" style="background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%); color: white; padding: 2rem; border-radius: 12px; margin: 2rem 0; text-align: center;">
+                <h2>👥 Quản lý người dùng</h2>
+                <p>Thêm quyền admin cho người dùng và xem thông tin cơ bản</p>
+            </div>
+            <div class="admin-card">
+                <div class="form-group">
+                    <label>Tên người dùng cần promote</label>
+                    <input type="text" id="promoteUsername" placeholder="Nhập tên người dùng">
+                </div>
+                <button type="button" onclick="handlePromoteAdmin()" class="btn btn-success">Promote Admin</button>
+                <div id="usersList" style="margin-top: 2rem;"></div>
+            </div>
+        </div>
+
+        <!-- Page: Orders -->
+        <div id="ordersPage" class="page">
+            <h2>Đơn hàng của tôi</h2>
+            <div id="ordersList" class="orders-list"></div>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeCart()">&times;</button>
+            <h2>🛒 Giỏ hàng</h2>
+            <div id="cartItems" class="cart-items"></div>
+            <div class="cart-summary">
+                <p>Tổng tiền: <strong id="cartTotal">0 VND</strong></p>
+                <button onclick="goToCheckout()" class="checkout-btn">Thanh toán</button>
+                <button type="button" onclick="closeCart()" class="btn btn-secondary">Tiếp tục mua</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkoutModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeCheckout()">&times;</button>
+            <h2>Thanh toán</h2>
+            <form onsubmit="handleCheckout(event)">
+                <input type="text" id="shippingAddress" placeholder="Địa chỉ giao hàng" required>
+                <input type="tel" id="phoneNumber" placeholder="Số điện thoại" required>
+                <textarea id="orderNotes" placeholder="Ghi chú (không bắt buộc)" rows="3"></textarea>
+                <button type="submit">Đặt hàng</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
