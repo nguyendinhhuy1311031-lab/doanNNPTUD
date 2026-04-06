@@ -3,7 +3,7 @@
 
 ## Mô tả dự án
 
-Đây là một dự án đơn giản với backend Node.js + Express + MongoDB và frontend tĩnh HTML/CSS/JS.
+Đây là một dự án với backend Node.js + Express + MongoDB và frontend tĩnh HTML/CSS/JS.
 
 ## Cách chạy
 
@@ -16,7 +16,7 @@
    - `MONGO_URI` kết nối MongoDB
    - `JWT_PRIVATEKEY_PATH=./config/keys/private.key`
    - `JWT_PUBLICKEY_PATH=./config/keys/public.key`
-   - `JWT_SECRET` giá trị bí mật
+   - `JWT_SECRET` 
 
 3. Chạy server:
    ```bash
