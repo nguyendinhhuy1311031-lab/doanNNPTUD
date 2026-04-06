@@ -82,20 +82,24 @@ async function apiUpload(endpoint, formData, method = 'POST') {
 // ============ AUTH ENDPOINTS ============
 
 async function loginUser(username, password) {
-    const result = await apiCall('/login', 'POST', { username, password });
+    const result = await apiCall('/api/auth/login', 'POST', { username, password });
     authToken = result.token;
     localStorage.setItem('token', authToken);
     return result;
 }
 
 async function signupUser(name, username, email, password, role = 'user') {
-    const result = await apiCall('/signup', 'POST', { name, username, email, password, role });
+    const result = await apiCall('/api/auth/signup', 'POST', { name, username, email, password, role });
     return result;
 }
 
 async function promoteUserToAdmin(username) {
-    const result = await apiCall('/promote-admin', 'POST', { username });
+    const result = await apiCall('/api/auth/promote-admin', 'POST', { username });
     return result;
+}
+
+async function getCurrentUser() {
+    return await apiCall('/api/auth/me');
 }
 
 async function logoutUser() {

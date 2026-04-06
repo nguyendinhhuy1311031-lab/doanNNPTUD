@@ -3,19 +3,37 @@
  * @description Routes for Order CRUD operations
  */
 
-const express = require('express');
-const router = express.Router();
-const orderController = require('../controllers/order.controller');
-const { verifyToken, roleAuthorization } = require('../middlewares');
+var express = require('express');
+var router = express.Router();
+let order = require('../controllers/order.controller');
+let middlewares = require('../middlewares');
+let verifyToken = middlewares.verifyToken;
+let roleAuthorization = middlewares.roleAuthorization;
 
 // All routes require authentication
-router.post('/', verifyToken, orderController.createOrder);
-router.get('/user/my-orders', verifyToken, orderController.getUserOrders);
-router.get('/:id', verifyToken, orderController.getOrderById);
+router.post('/', verifyToken, async function (req, res, next) {
+    await order.createOrder(req, res, next);
+});
+
+router.get('/user/my-orders', verifyToken, async function (req, res, next) {
+    await order.getUserOrders(req, res, next);
+});
+
+router.get('/:id', verifyToken, async function (req, res, next) {
+    await order.getOrderById(req, res, next);
+});
 
 // Admin only routes
-router.get('/', verifyToken, roleAuthorization(['admin']), orderController.getAllOrders);
-router.put('/:id/status', verifyToken, roleAuthorization(['admin']), orderController.updateOrderStatus);
-router.put('/:id/cancel', verifyToken, orderController.cancelOrder);
+router.get('/', verifyToken, roleAuthorization(['admin']), async function (req, res, next) {
+    await order.getAllOrders(req, res, next);
+});
+
+router.put('/:id/status', verifyToken, roleAuthorization(['admin']), async function (req, res, next) {
+    await order.updateOrderStatus(req, res, next);
+});
+
+router.put('/:id/cancel', verifyToken, async function (req, res, next) {
+    await order.cancelOrder(req, res, next);
+});
 
 module.exports = router;

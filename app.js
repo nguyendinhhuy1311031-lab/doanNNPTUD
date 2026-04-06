@@ -2,14 +2,14 @@
  * @file app.js
  * @description This file initializes and configures the Express server for the API.
  * 
- * The server uses environment variables, sets up middleware, handles CORS, and connects to the PostgreSQL database.
+ * The server uses environment variables, sets up middleware, handles CORS, and connects to MongoDB.
  * It also configures Swagger for API documentation and sets up routes for authentication, user management, and role management.
  * 
  * Key features:
  * 
  * - Initializes environment variables using dotenv.
  * - Sets up middleware for request parsing, logging, and CORS.
- * - Configures PostgreSQL database connection and synchronization.
+ * - Configures MongoDB database connection and synchronization.
  * - Sets up Swagger documentation.
  * - Defines API routes.
  * - Handles 404 errors for undefined routes.
@@ -67,7 +67,7 @@ if (allowlist) {
 db.mongoose.connection.on('error', console.error.bind(console, 'connection error:'));
 db.mongoose.connection.once('open', function () {
     console.log('Connected to MongoDB');
-    initial()
+    initial();
 });
 
 // Set up Swagger API documentation
@@ -127,7 +127,6 @@ const server = app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
 
-
 server.on('error', (err) => {
     console.error('🔥 Server error:', err.message);
 
@@ -135,7 +134,7 @@ server.on('error', (err) => {
         console.error(`❌ Port ${PORT} is already in use. Hãy kill port hoặc đổi port.`);
     }
 
-    process.exit(1); 
+    process.exit(1);
 });
 
 module.exports = server;

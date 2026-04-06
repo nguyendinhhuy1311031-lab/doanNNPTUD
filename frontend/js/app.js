@@ -13,14 +13,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (authToken && !currentUser) {
         // Fetch user info if token exists but no currentUser
         try {
-            const response = await fetch(`${API_URL}/auth/me`, {
-                headers: { 'Authorization': `Bearer ${authToken}` }
-            });
-            if (response.ok) {
-                const result = await response.json();
-                currentUser = result.data.user;
-                localStorage.setItem('user', JSON.stringify(currentUser));
-            }
+            const result = await getCurrentUser();
+            currentUser = result.user;
+            localStorage.setItem('user', JSON.stringify(currentUser));
         } catch (error) {
             console.error('Error fetching user:', error);
             authToken = null;
@@ -139,8 +134,9 @@ async function handleLogin(e) {
     const password = document.getElementById('loginPassword').value;
 
     try {
-        const result = await loginUser(username, password);
-        currentUser = result.data.user;
+        await loginUser(username, password);
+        const result = await getCurrentUser();
+        currentUser = result.user;
         localStorage.setItem('user', JSON.stringify(currentUser));
         updateNavbar();
         showToast('✅ Đăng nhập thành công!', 'success');

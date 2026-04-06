@@ -3,12 +3,12 @@
  * @description Controller for Comment CRUD operations
  */
 
-const db = require('../models');
-const Comment = db.comment;
-const Product = db.product;
+var db = require('../models');
+var Comment = db.comment;
+var Product = db.product;
 
 // Create Comment
-exports.createComment = async (req, res) => {
+var createComment = async function(req, res) {
     try {
         const { productId, rating, text } = req.body;
 
@@ -48,7 +48,7 @@ exports.createComment = async (req, res) => {
 };
 
 // Get all Comments for a Product
-exports.getProductComments = async (req, res) => {
+var getProductComments = async function(req, res) {
     try {
         const comments = await Comment.find({ product: req.params.productId })
             .populate('user', 'name email')
@@ -64,7 +64,7 @@ exports.getProductComments = async (req, res) => {
 };
 
 // Get Comment by ID
-exports.getCommentById = async (req, res) => {
+var getCommentById = async function(req, res) {
     try {
         const comment = await Comment.findById(req.params.id)
             .populate('user', 'name email')
@@ -84,7 +84,7 @@ exports.getCommentById = async (req, res) => {
 };
 
 // Update Comment
-exports.updateComment = async (req, res) => {
+var updateComment = async function(req, res) {
     try {
         const { rating, text } = req.body;
 
@@ -118,7 +118,7 @@ exports.updateComment = async (req, res) => {
 };
 
 // Delete Comment
-exports.deleteComment = async (req, res) => {
+var deleteComment = async function(req, res) {
     try {
         const comment = await Comment.findById(req.params.id);
         if (!comment) {
@@ -138,7 +138,7 @@ exports.deleteComment = async (req, res) => {
 };
 
 // Like Comment
-exports.likeComment = async (req, res) => {
+var likeComment = async function(req, res) {
     try {
         const comment = await Comment.findByIdAndUpdate(
             req.params.id,
@@ -158,4 +158,13 @@ exports.likeComment = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
+};
+
+module.exports = {
+    createComment: createComment,
+    getProductComments: getProductComments,
+    getCommentById: getCommentById,
+    updateComment: updateComment,
+    deleteComment: deleteComment,
+    likeComment: likeComment
 };

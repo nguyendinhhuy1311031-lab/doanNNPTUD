@@ -6,7 +6,7 @@
  * The controller interacts with the database to perform CRUD operations related to user roles.
  */
 
-const db = require('../models');
+var db = require('../models');
 
 /**
  * Controller function to create a new role
@@ -16,10 +16,10 @@ const db = require('../models');
  * @description This function takes the role name and description from the request body, creates a new role in the database, and returns the created role.
  *  If an error occurs during the process, it returns a 500 status code with an error message.
  */
-exports.createRole = async (req, res) => {
+var createRole = async function(req, res) {
     const { roleName, description } = req.body;
     try {
-        const role = await db.role.create({ roleName, description });
+        var role = await db.role.create({ roleName, description });
         res.status(201).json(role);
     } catch (error) {
         res.status(500).json({ message: 'Error creating role', error: error.message });
@@ -34,7 +34,7 @@ exports.createRole = async (req, res) => {
  * @description This function takes the user ID and role ID from the request body, assigns the specified role to the user in the database, 
  * and returns a success message. If an error occurs during the process, it returns a 500 status code with an error message.
  */
-exports.assignRoleToUser = async (req, res) => {
+var assignRoleToUser = async function(req, res) {
     const { userId, roleId } = req.body;
     try {
         await db.user_roles.create({ userId, roleId });
@@ -53,18 +53,24 @@ exports.assignRoleToUser = async (req, res) => {
  * and returns the roles. If the user is not found, it returns a 401 status code with an error message. If an error occurs during the process, 
  * it returns a 500 status code with an error message.
  */
-exports.getUserRoles = async (req, res) => {
+var getUserRoles = async function(req, res) {
     const userId = req.params.userId;
     try {
-        const userRoles = await db.user_roles.find({ userId: userId }).populate('roleId');
+        var userRoles = await db.user_roles.find({ userId: userId }).populate('roleId');
         if (!userRoles) {
             return res.status(401).json({ message: 'User not found' });
         }
  
         
-        const roles = userRoles.map(ur => ur.roleId.roleName);
+        var roles = userRoles.map(ur => ur.roleId.roleName);
         res.status(200).json(roles);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching user roles', error: error.message });
     }
+};
+
+module.exports = {
+    createRole: createRole,
+    assignRoleToUser: assignRoleToUser,
+    getUserRoles: getUserRoles
 };

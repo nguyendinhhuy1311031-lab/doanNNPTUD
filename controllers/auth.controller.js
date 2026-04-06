@@ -64,18 +64,7 @@ exports.login = async (req, res) => {
             userId: user.id
         });
         req.user = { id: user.id };
-
-        // Get user roles
-        const userRoles = await db.user_roles.find({ userId: user._id }).populate('roleId');
-        const roles = userRoles.map(ur => ur.roleId.roleName);
-
-        const responseData = {
-            message: 'Login successful',
-            token,
-            data: { user: { id: user.id, username: user.username, email: user.email, name: user.name, role: roles } }
-        };
-        console.log('Login response:', JSON.stringify(responseData, null, 2));
-        res.status(200).json(responseData);
+        res.status(200).json({ token });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
@@ -103,35 +92,24 @@ exports.signup = async (req, res) => {
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Create new user (mark as verified in development mode)
+        // Create new user
         const newUser = await db.user.create({
             username,
             email,
             password: hashedPassword,
-            emailVerified: process.env.PRODUCTION !== 'true', // Auto-verify in development mode
+            emailVerified: false,
             acceptedTerms: true
         });
-
-        const targetRoleName = req.body.role && req.body.role.toLowerCase() === 'admin' ? 'admin' : 'user';
-        const existingRole = await db.role.findOne({ roleName: targetRoleName });
-        if (!existingRole) {
-            return res.status(500).json({ message: `Role '${targetRoleName}' not found` });
-        }
-
-        await db.user_roles.create({ userId: newUser.id, roleId: existingRole.id });
+        const existingRole = await db.role.findOne({ roleName: 'user' });
+        await db.user_roles.create({ userId: newUser.id, roleId: existingRole });
         req.user = { id: newUser.id };
-        
-        // Try to send verification email (but don't fail if email is not configured)
-        try {
-            const verificationToken = jwt.sign({ id: newUser.id, email: newUser.email }, jwt_config.secret, { expiresIn: '1h' });
-            const verificationLink = `${config.baseUrl}/verification/${verificationToken}`;
-            await sendVerificationEmail(email, 'Account Verification', `Click the link to verify your account: ${verificationLink}`);
-        } catch (emailError) {
-            console.warn('Warning: Could not send verification email:', emailError.message);
-            // Continue anyway - user can still signup without email verification in dev mode
-        }
+        // Generate verification token
+        const verificationToken = jwt.sign({ id: newUser.id, email: newUser.email }, jwt_config.secret, { expiresIn: '1h' });
+        const verificationLink = `${config.baseUrl}/verification/${verificationToken}`;
+        // Send verification email
+        await sendVerificationEmail(email, 'Account Verification', `Click the link to verify your account: ${verificationLink}`);
 
-        res.status(201).json({ message: 'User registered successfully. You can now login!' });
+        res.status(201).json({ message: 'User registered successfully. Please check your email to verify your account.' });
     } catch (error) {
         res.status(500).json({ message: 'Internal server error', error: error.message });
     }
@@ -231,34 +209,38 @@ exports.verifyUser = (req, res) => {
  * @returns {void}
  */
 exports.getCurrentUser = (req, res) => {
-    res.status(200).json({
-        message: 'User info retrieved',
-        data: { user: req.user }
-    });
+    res.status(200).json({ user: req.user });
 };
 
+/**
+ * @function promoteToAdmin
+ * @description Promotes a user to admin role.
+ * @param {Object} req - The request object (contains user id to promote).
+ * @param {Object} res - The response object.
+ * @returns {void}
+ */
 exports.promoteToAdmin = async (req, res) => {
-    try {
-        const { username } = req.body;
-        if (!username) {
-            return res.status(400).json({ message: 'Username is required' });
-        }
+    const { userId, username } = req.body;
 
-        const user = await db.user.findOne({ username });
+    try {
+        const user = userId ? await db.user.findById(userId) : await db.user.findOne({ username });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
         const adminRole = await db.role.findOne({ roleName: 'admin' });
         if (!adminRole) {
-            return res.status(500).json({ message: 'Admin role missing in DB' });
+            return res.status(500).json({ message: 'Admin role not found' });
         }
 
-        await db.user_roles.create({ userId: user.id, roleId: adminRole.id });
+        const existingRole = await db.user_roles.findOne({ userId: user._id, roleId: adminRole._id });
+        if (!existingRole) {
+            await db.user_roles.create({ userId: user._id, roleId: adminRole._id });
+        }
 
-        res.status(200).json({ message: `${username} promoted to admin` });
+        res.status(200).json({ message: 'User promoted to admin successfully' });
     } catch (error) {
-        res.status(500).json({ message: 'Internal server error', error: error.message });
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
